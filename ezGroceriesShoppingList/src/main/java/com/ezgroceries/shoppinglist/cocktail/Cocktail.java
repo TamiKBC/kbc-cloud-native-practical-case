@@ -17,6 +17,6 @@ public class Cocktail {
     private String glass;
     private String instructions;
     private String image;
-    private List<Ingredient> ingredients;
+    private List<String> ingredients;
 
 }
