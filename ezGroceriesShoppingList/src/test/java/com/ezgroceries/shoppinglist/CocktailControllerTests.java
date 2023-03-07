@@ -1,35 +1,66 @@
 package com.ezgroceries.shoppinglist;
 
+import com.ezgroceries.shoppinglist.Feign.CocktailDBClient;
 import com.ezgroceries.shoppinglist.cocktail.CocktailControler;
+import com.ezgroceries.shoppinglist.cocktail.CocktailDBResponse;
 import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
 import com.ezgroceries.shoppinglist.cocktail.CocktailService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.web.servlet.MockMvc;
+
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 public class CocktailControllerTests {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private CocktailDBClient cocktailDBClient;
+
     private CocktailControler controller;
+
     @BeforeEach
     public void setUp() throws Exception {
-        controller = new CocktailControler(new CocktailService());
+        controller = new CocktailControler(new CocktailService(cocktailDBClient));
     }
 
     @Test
     public void testCreateShoppingList(){
+
         setupFakeRequest("http://localhost/cocktails");
+        CocktailDBResponse cocktailDBResponse = CocktailDBResponse.builder().build();
+        List<CocktailDBResponse.DrinkResource> drinkResources = new ArrayList<>();
+        drinkResources.add(CocktailDBResponse.DrinkResource.builder().strDrink("test1").build());
+        drinkResources.add(CocktailDBResponse.DrinkResource.builder().strDrink("test2").build());
+        cocktailDBResponse.setDrinks(drinkResources); ;
+        ;
+        when(cocktailDBClient.searchCocktails("Russian")).thenReturn(cocktailDBResponse);
         ResponseEntity<List<CocktailDTO>> response = controller.getCocktails("Russian");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertEquals(2,response.getBody().size());
+
+
     }
 
     /**

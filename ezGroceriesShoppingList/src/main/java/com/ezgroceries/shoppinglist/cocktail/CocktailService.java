@@ -1,5 +1,6 @@
 package com.ezgroceries.shoppinglist.cocktail;
 
+import com.ezgroceries.shoppinglist.Feign.CocktailDBClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,33 +10,47 @@ import java.util.UUID;
 
 @Service
 public class CocktailService {
+    private CocktailDBClient cocktailDBClient;
+
+    public CocktailService(CocktailDBClient cocktailDBClient) {
+        this.cocktailDBClient = cocktailDBClient;
+    }
 
     public List<CocktailDTO> getCocktails(String search) {
         List<CocktailDTO> cocktailDTOList = new ArrayList<>();
-        CocktailDTO cocktailDTO1= CocktailDTO.builder()
-                .cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4"))
-                .name("Margerita")
-                .glass("Cocktail glass")
-                .instructions("Rub the rim of the glass with the lime slice to make the salt stick to it. Take care to moisten..")
-                .image("https://www.thecocktaildb.com/images/media/drink/wpxpvu1439905379.jpg")
-                .ingredients(Arrays.asList(Ingredient.builder().name("Tequila").build(),
-                        Ingredient.builder().name("Triple sec").build(),
-                        Ingredient.builder().name("Lime juice").build(),
-                        Ingredient.builder().name("Salt").build()))
-                .build();
-        CocktailDTO cocktailDTO2= CocktailDTO.builder()
-                .cocktailId(UUID.fromString("d615ec78-fe93-467b-8d26-5d26d8eab073"))
-                .name("Blue Margerita")
-                .glass("Cocktail glass")
-                .instructions("Rub rim of cocktail glass with lime juice. Dip rim in coarse salt..")
-                .image("https://www.thecocktaildb.com/images/media/drink/qtvvyq1439905913.jpg")
-                .ingredients(Arrays.asList(Ingredient.builder().name("Tequila").build(),
-                        Ingredient.builder().name("Blue Curacao").build(),
-                        Ingredient.builder().name("Lime juice").build(),
-                        Ingredient.builder().name("Salt").build()))
-                .build();
-        cocktailDTOList.add(cocktailDTO1);
-        cocktailDTOList.add(cocktailDTO2);
+        CocktailDBResponse cocktailDBResponse = cocktailDBClient.searchCocktails(search);
+        cocktailDTOList = mapResponseToDTO(cocktailDBResponse);
+        return cocktailDTOList;
+    }
+
+    private List<CocktailDTO> mapResponseToDTO(CocktailDBResponse cocktailDBResponse) {
+        List<CocktailDTO> cocktailDTOList = new ArrayList<>();
+        for(CocktailDBResponse.DrinkResource drinkResource: cocktailDBResponse.getDrinks() ){
+            List<String> ingredients= new ArrayList<>();
+            if(drinkResource.strIngredient1 !=null) ingredients.add(drinkResource.strIngredient1);
+            if(drinkResource.strIngredient2 !=null) ingredients.add(drinkResource.strIngredient2);
+            if(drinkResource.strIngredient3 !=null) ingredients.add(drinkResource.strIngredient3);
+            if(drinkResource.strIngredient4 !=null) ingredients.add(drinkResource.strIngredient4);
+            if(drinkResource.strIngredient5 !=null) ingredients.add(drinkResource.strIngredient5);
+            if(drinkResource.strIngredient6 !=null) ingredients.add(drinkResource.strIngredient6);
+            if(drinkResource.strIngredient7 !=null) ingredients.add(drinkResource.strIngredient7);
+            if(drinkResource.strIngredient8 !=null) ingredients.add(drinkResource.strIngredient8);
+            if(drinkResource.strIngredient9 !=null) ingredients.add(drinkResource.strIngredient9);
+            if(drinkResource.strIngredient10 !=null) ingredients.add(drinkResource.strIngredient10);
+            if(drinkResource.strIngredient11 !=null) ingredients.add(drinkResource.strIngredient11);
+            if(drinkResource.strIngredient12 !=null) ingredients.add(drinkResource.strIngredient12);
+            if(drinkResource.strIngredient13 !=null) ingredients.add(drinkResource.strIngredient13);
+            if(drinkResource.strIngredient14 !=null) ingredients.add(drinkResource.strIngredient14);
+            if(drinkResource.strIngredient15 !=null) ingredients.add(drinkResource.strIngredient15);
+            cocktailDTOList.add(CocktailDTO.builder()
+                    .cocktailId(UUID.randomUUID())
+                    .name(drinkResource.strDrink)
+                    .glass(drinkResource.strGlass)
+                    .instructions(drinkResource.strInstructions)
+                    .image(drinkResource.strImageSource)
+                    .ingredients(ingredients)
+                    .build());
+        }
         return cocktailDTOList;
     }
 }

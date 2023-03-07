@@ -30,7 +30,9 @@ private final ShoppingListService shoppingListService;
     public ResponseEntity<Void> addCocktailIngredientsToList(@PathVariable UUID shoppingListId, @RequestBody CocktailDTO cocktailDTO){
 
         UUID createdShoppingListId = shoppingListService.addIngredientsFromCocktail(shoppingListId, cocktailDTO);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+        //URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/shopping-lists/{shoppingListId}")
+                .buildAndExpand(createdShoppingListId).toUri();
         return ResponseEntity.created(location).build();
     }
 
