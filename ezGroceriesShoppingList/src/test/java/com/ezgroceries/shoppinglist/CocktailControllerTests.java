@@ -6,6 +6,7 @@ import com.ezgroceries.shoppinglist.cocktail.CocktailDBResponse;
 import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
 import com.ezgroceries.shoppinglist.cocktail.CocktailService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

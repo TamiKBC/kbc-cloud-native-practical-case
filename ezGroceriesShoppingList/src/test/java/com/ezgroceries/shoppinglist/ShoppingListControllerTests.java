@@ -36,7 +36,7 @@ public class ShoppingListControllerTests {
         setupFakeRequest("http://localhost/shopping-lists/"+shoppingList+"/cocktails");
         ResponseEntity<Void> response = controller.addCocktailIngredientsToList(shoppingList,CocktailDTO.builder().cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4")).build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertEquals("http://localhost/shopping-lists/"+shoppingList+"/cocktails",response.getHeaders().getLocation().toString());
+        assertEquals("http://localhost/shopping-lists/"+shoppingList,response.getHeaders().getLocation().toString());
     }
     @Test
     public void getShoppingList(){
