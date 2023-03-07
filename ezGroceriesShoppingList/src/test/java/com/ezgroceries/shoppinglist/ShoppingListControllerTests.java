@@ -17,9 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShoppingListControllerTests {
     private ShoppingListControler controller;
+
+    //TO DO: did nog echt werkende krijgen, heb nu snel toegevoegd om geen error te hebben terwijl
+    //ik service en repo opzet
+    private ShoppingListRepository shoppingListRepository;
     @BeforeEach
     public void setUp() throws Exception {
-        controller = new ShoppingListControler(new ShoppingListService());
+        controller = new ShoppingListControler(new ShoppingListService(shoppingListRepository));
     }
 
     @Test

@@ -11,10 +11,18 @@ import java.util.UUID;
 @Service
 public class ShoppingListService {
 
+private final ShoppingListRepository shoppingListRepository;
+
+    public ShoppingListService(ShoppingListRepository shoppingListRepository) {
+        this.shoppingListRepository = shoppingListRepository;
+    }
 
     public UUID createNewList(ShoppingListNameDTO shoppingListNameDTO) {
-
-        UUID shoppingListId= UUID.fromString("90689338-499a-4c49-af90-f1e73068ad4f");
+        ShoppingListEntity shoppingListEntity = ShoppingListEntity.builder()
+                .name(shoppingListNameDTO.getName())
+                .build();
+        ShoppingListEntity shoppingListEntityNew = shoppingListRepository.save(shoppingListEntity);
+        UUID shoppingListId= shoppingListEntityNew.getId();
          return shoppingListId;
     }
 
