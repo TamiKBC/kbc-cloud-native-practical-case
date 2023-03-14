@@ -22,6 +22,9 @@ public class CocktailDBResponse {
 
     @Builder
     @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DrinkResource {
         public String idDrink;
         public String strDrink;
