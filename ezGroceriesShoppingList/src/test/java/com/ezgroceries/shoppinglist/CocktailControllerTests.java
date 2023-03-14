@@ -35,6 +35,7 @@ public class CocktailControllerTests {
 
     private CocktailControler controller;
 
+    @Autowired
     private CocktailRepository cocktailRepository;
 
     @BeforeEach
@@ -43,7 +44,7 @@ public class CocktailControllerTests {
     }
 
     @Test
-    public void testCreateShoppingList(){
+    public void testGetCocktails(){
 
         setupFakeRequest("http://localhost/cocktails");
         CocktailDBResponse cocktailDBResponse = CocktailDBResponse.builder().build();
