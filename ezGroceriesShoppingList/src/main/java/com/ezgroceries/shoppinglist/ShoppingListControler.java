@@ -4,7 +4,6 @@ import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -27,10 +26,9 @@ private final ShoppingListService shoppingListService;
     }
 
     @PostMapping(value="/shopping-lists/{shoppingListId}/cocktails")
-    public ResponseEntity<Void> addCocktailIngredientsToList(@PathVariable UUID shoppingListId, @RequestBody CocktailDTO cocktailDTO){
+    public ResponseEntity<Void> addCocktailToList(@PathVariable UUID shoppingListId, @RequestBody CocktailDTO cocktailDTO){
 
-        UUID createdShoppingListId = shoppingListService.addIngredientsFromCocktail(shoppingListId, cocktailDTO);
-        //URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+        UUID createdShoppingListId = shoppingListService.addCocktail(shoppingListId, cocktailDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/shopping-lists/{shoppingListId}")
                 .buildAndExpand(createdShoppingListId).toUri();
         return ResponseEntity.created(location).build();

@@ -3,29 +3,43 @@ package com.ezgroceries.shoppinglist;
 import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 public class ShoppingListControllerTests {
     private ShoppingListControler controller;
+
+
+    @MockBean
+    private ShoppingListService shoppingListService;
+
     @BeforeEach
     public void setUp() throws Exception {
-        controller = new ShoppingListControler(new ShoppingListService());
+        controller = new ShoppingListControler(shoppingListService);
     }
 
     @Test
     public void testCreateShoppingList(){
         setupFakeRequest("http://localhost/shopping-lists");
-        ResponseEntity<Void> response = controller.createShoppingList(ShoppingListNameDTO.builder().name("Stephanie's birthday").build());
+        ShoppingListNameDTO shoppingListName = ShoppingListNameDTO.builder().name("Stephanie's birthday").build();
+        when(shoppingListService.createNewList(shoppingListName)).thenReturn(UUID.fromString("90689338-499a-4c49-af90-f1e73068ad4f"));
+        ResponseEntity<Void> response = controller.createShoppingList(shoppingListName);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertEquals("http://localhost/shopping-lists/90689338-499a-4c49-af90-f1e73068ad4f",response.getHeaders().getLocation().toString());
     }
@@ -33,14 +47,17 @@ public class ShoppingListControllerTests {
     @Test
     public void addCocktailToShoppingList(){
         UUID shoppingList = UUID.fromString("90689338-499a-4c49-af90-f1e73068ad4f");
+        CocktailDTO cocktailDTO =CocktailDTO.builder().cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4")).build();
         setupFakeRequest("http://localhost/shopping-lists/"+shoppingList+"/cocktails");
-        ResponseEntity<Void> response = controller.addCocktailIngredientsToList(shoppingList,CocktailDTO.builder().cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4")).build());
+        when(shoppingListService.addCocktail(shoppingList,cocktailDTO)).thenReturn(shoppingList);
+        ResponseEntity<Void> response = controller.addCocktailToList(shoppingList,cocktailDTO);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertEquals("http://localhost/shopping-lists/"+shoppingList,response.getHeaders().getLocation().toString());
     }
     @Test
     public void getShoppingList(){
         UUID shoppingList = UUID.fromString("90689338-499a-4c49-af90-f1e73068ad4f");
+        when(shoppingListService.getShoppingList(shoppingList)).thenReturn(ShoppingListDTO.builder().shoppingListId(shoppingList).name("Stephanie's birthday").build());
         setupFakeRequest("http://localhost/shopping-lists/"+shoppingList);
         ResponseEntity<ShoppingListDTO> response = controller.getShoppingList(shoppingList);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -51,9 +68,13 @@ public class ShoppingListControllerTests {
     @Test
     public void getAllShoppingList(){
         setupFakeRequest("http://localhost/shopping-lists");
+        List<ShoppingListDTO> responseDTO = new ArrayList<>();
+        responseDTO.add(ShoppingListDTO.builder().build());
+        responseDTO.add(ShoppingListDTO.builder().build());
+        when(shoppingListService.getAllShoppingList()).thenReturn(responseDTO );
         ResponseEntity<List<ShoppingListDTO>> response = controller.getAllShoppingList();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertEquals(response.getBody().size(),2);
+        assertEquals(2,response.getBody().size());
 
     }
 

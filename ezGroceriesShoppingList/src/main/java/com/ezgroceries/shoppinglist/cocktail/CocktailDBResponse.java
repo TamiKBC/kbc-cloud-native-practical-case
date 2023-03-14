@@ -21,6 +21,7 @@ public class CocktailDBResponse {
     }
 
     @Builder
+    @Getter
     public static class DrinkResource {
         public String idDrink;
         public String strDrink;
