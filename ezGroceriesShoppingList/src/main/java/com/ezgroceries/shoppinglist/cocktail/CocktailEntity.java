@@ -20,5 +20,11 @@ public class CocktailEntity {
     private UUID id;
     private String idDrink;
     private String name;
+    @Column(name ="GLASS")
+    private String strGlass;
+    @Column(name ="INSTRUCTIONS")
+    private String  strInstructions;
+    @Column(name ="IMAGESOURCE")
+    public String strImageSource;
 
 }
