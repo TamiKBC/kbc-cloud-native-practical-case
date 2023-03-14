@@ -1,9 +1,6 @@
 package com.ezgroceries.shoppinglist;
 
-import com.ezgroceries.shoppinglist.Feign.CocktailDBClient;
 import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
-import com.ezgroceries.shoppinglist.cocktail.CocktailRepository;
-import com.ezgroceries.shoppinglist.cocktail.CocktailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
