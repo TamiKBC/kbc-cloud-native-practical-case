@@ -1,20 +1,21 @@
 package com.ezgroceries.shoppinglist;
 
-import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
+import com.ezgroceries.shoppinglist.cocktail.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ShoppingListService {
 
 private final ShoppingListRepository shoppingListRepository;
+    private final CocktailRepository cocktailRepository;
+    private final CocktailService cocktailService;
 
-    public ShoppingListService(ShoppingListRepository shoppingListRepository) {
+    public ShoppingListService(ShoppingListRepository shoppingListRepository, CocktailRepository cocktailRepository, CocktailService cocktailService) {
         this.shoppingListRepository = shoppingListRepository;
+        this.cocktailRepository = cocktailRepository;
+        this.cocktailService = cocktailService;
     }
 
     public UUID createNewList(ShoppingListNameDTO shoppingListNameDTO) {
@@ -26,42 +27,52 @@ private final ShoppingListRepository shoppingListRepository;
          return shoppingListId;
     }
 
-    public UUID addIngredientsFromCocktail(UUID shoppingListId, CocktailDTO cocktailDTO) {
+    public UUID addCocktail(UUID shoppingListId, CocktailDTO cocktailDTO) {
+        Optional<ShoppingListEntity> shoppingListEntityOptional = shoppingListRepository.findById(shoppingListId);
+        if(shoppingListEntityOptional.isPresent()){
+            ShoppingListEntity shoppingList = shoppingListEntityOptional.get();
+            cocktailRepository.findById(cocktailDTO.getCocktailId());
+            if(cocktailRepository.findById(cocktailDTO.getCocktailId()).isPresent()) {
+
+                Set<CocktailEntity> cocktailList = shoppingList.getCocktails();
+                cocktailList.add(cocktailRepository.findById(cocktailDTO.getCocktailId()).get());
+                shoppingList.setCocktails(cocktailList);
+                shoppingListRepository.save(shoppingList);
+            }
+
+        }
         return shoppingListId;
     }
 
     public ShoppingListDTO getShoppingList(UUID shoppingListId) {
-        return ShoppingListDTO.builder()
-                .shoppingListId(shoppingListId)
-                .name("Stephanie's birthday")
-                .ingredients(Arrays.asList("Tequila",
-                        "Triple sec",
-                        "Lime juice",
-                        "Salt",
-                        "Blue Curacao"))
+        ShoppingListDTO shoppingListDTO = ShoppingListDTO.builder()
                 .build();
+        Optional<ShoppingListEntity> shoppingListOptional = shoppingListRepository.findById(shoppingListId);
+        if(shoppingListOptional.isPresent()){
+            ShoppingListEntity shoppingList = shoppingListOptional.get();
+            Set<String> ingredients = new HashSet<>();
+            Set<CocktailEntity> cocktailList = shoppingList.getCocktails();
+            for(CocktailEntity cocktailEntity : cocktailList){
+                List<CocktailResource> cocktails = cocktailService.getCocktails(cocktailEntity.getName());
+                for(CocktailResource cocktailResource : cocktails){
+                    Set<String> cocktailIngredients = cocktailResource.getIngredients();
+                    ingredients.addAll(cocktailIngredients);
+                }
+            }
+            shoppingListDTO.setName(shoppingList.getName());
+            shoppingListDTO.setShoppingListId(shoppingListId);
+            shoppingListDTO.setIngredients(new ArrayList<>(ingredients));
+        }
+
+        return shoppingListDTO;
     }
 
     public List<ShoppingListDTO> getAllShoppingList() {
         List<ShoppingListDTO> shoppingListDTOS =  new ArrayList<>();
-        shoppingListDTOS.add(ShoppingListDTO.builder()
-                .shoppingListId(UUID.fromString("4ba92a46-1d1b-4e52-8e38-13cd56c7224c"))
-                .name("Stephanie's birthday")
-                .ingredients(Arrays.asList("Tequila",
-                        "Triple sec",
-                        "Lime juice",
-                        "Salt",
-                        "Blue Curacao"))
-                .build());
-        shoppingListDTOS.add(ShoppingListDTO.builder()
-                .shoppingListId(UUID.fromString("6c7d09c2-8a25-4d54-a979-25ae779d2465"))
-                .name("My Birthday")
-                .ingredients(Arrays.asList("Tequila",
-                        "Triple sec",
-                        "Lime juice",
-                        "Salt",
-                        "Blue Curacao"))
-                .build());
+        List<ShoppingListEntity> allShoppingLists = shoppingListRepository.findAll();
+        for (ShoppingListEntity shoppingList : allShoppingLists) {
+            shoppingListDTOS.add(getShoppingList(shoppingList.getId()));
+        }
         return shoppingListDTOS;
     }
 }

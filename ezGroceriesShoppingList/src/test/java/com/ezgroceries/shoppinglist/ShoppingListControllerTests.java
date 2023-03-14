@@ -1,6 +1,8 @@
 package com.ezgroceries.shoppinglist;
 
 import com.ezgroceries.shoppinglist.cocktail.CocktailDTO;
+import com.ezgroceries.shoppinglist.cocktail.CocktailRepository;
+import com.ezgroceries.shoppinglist.cocktail.CocktailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,9 +23,11 @@ public class ShoppingListControllerTests {
     //TO DO: did nog echt werkende krijgen, heb nu snel toegevoegd om geen error te hebben terwijl
     //ik service en repo opzet
     private ShoppingListRepository shoppingListRepository;
+    private CocktailRepository cocktailRepository;
+    private CocktailService cocktailService;
     @BeforeEach
     public void setUp() throws Exception {
-        controller = new ShoppingListControler(new ShoppingListService(shoppingListRepository));
+        controller = new ShoppingListControler(new ShoppingListService(shoppingListRepository, cocktailRepository, cocktailService));
     }
 
     @Test
@@ -38,7 +42,7 @@ public class ShoppingListControllerTests {
     public void addCocktailToShoppingList(){
         UUID shoppingList = UUID.fromString("90689338-499a-4c49-af90-f1e73068ad4f");
         setupFakeRequest("http://localhost/shopping-lists/"+shoppingList+"/cocktails");
-        ResponseEntity<Void> response = controller.addCocktailIngredientsToList(shoppingList,CocktailDTO.builder().cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4")).build());
+        ResponseEntity<Void> response = controller.addCocktailToList(shoppingList,CocktailDTO.builder().cocktailId(UUID.fromString("23b3d85a-3928-41c0-a533-6538a71e17c4")).build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertEquals("http://localhost/shopping-lists/"+shoppingList,response.getHeaders().getLocation().toString());
     }

@@ -20,9 +20,9 @@ private static final Logger log = LoggerFactory.getLogger(CocktailControler.clas
     }
 
     @GetMapping(value="/cocktails")
-    public ResponseEntity<List<CocktailDTO>> getCocktails(@RequestParam String search){
-        List<CocktailDTO> cocktailDTOList = cocktailService.getCocktails(search);
+    public ResponseEntity<List<CocktailResource>> getCocktails(@RequestParam String search){
+        List<CocktailResource> cocktailResourceList = cocktailService.getCocktails(search);
         log.info("CocktailList for " + search + "found");
-        return ResponseEntity.ok(cocktailDTOList);
+        return ResponseEntity.ok(cocktailResourceList);
     }
 }

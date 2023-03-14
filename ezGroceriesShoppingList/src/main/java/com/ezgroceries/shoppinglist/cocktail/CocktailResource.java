@@ -7,18 +7,23 @@ import javax.persistence.*;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
-@Table(name = "cocktail")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CocktailEntity {
+public class CocktailResource {
+
     @Id
     @GeneratedValue
+
     private UUID id;
-    private String idDrink;
     private String name;
+    private String strGlass;
+    private String  strInstructions;
+    private String strDrinkThumb;
+    @Convert(converter = StringSetConverter.class)
+    private Set<String> ingredients;
+
 
 }
