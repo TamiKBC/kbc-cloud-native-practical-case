@@ -20,6 +20,8 @@ public class ShoppingListEntity {
     private UUID id;
     private String name;
 
+    private String username;
+
     @ManyToMany
     @JoinTable(
             name = "cocktail_shopping_list",
